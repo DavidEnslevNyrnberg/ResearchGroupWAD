@@ -55,3 +55,33 @@ score.sentiment = function(sentences, pos.words, neg.words, .progress='none')
   scores.df = data.frame(score=scores, text=sentences)
   return(scores.df)
 }
+
+clearTweets <- function(tweets, excl)
+{
+  require(twitteR)
+  require(plyr)
+  require(stringr)
+  require(bitops)
+  require(NLP)
+  require(tm)
+
+  tweets.text <- sapply(tweets, function(t)t$getText()) #get text out of tweets
+
+
+  tweets.text = gsub('[[:cntrl:]]', '', tweets.text)
+  tweets.text = gsub('\\d+', '', tweets.text)
+  tweets.text <- str_replace_all(tweets.text,"[^[:graph:]]", " ") #remove graphic
+
+
+  corpus <- Corpus(VectorSource(tweets.text))
+
+  corpus_clean <- tm_map(corpus, removePunctuation)
+  corpus_clean <- tm_map(corpus_clean, content_transformer(tolower))
+  corpus_clean <- tm_map(corpus_clean, removeWords, stopwords("english"))
+  corpus_clean <- tm_map(corpus_clean, removeNumbers)
+  corpus_clean <- tm_map(corpus_clean, stripWhitespace)
+  corpus_clean <- tm_map(corpus_clean, removeWords, c(excl,"http","https","httpst"))
+
+
+  return(corpus_clean)
+}

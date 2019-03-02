@@ -1,0 +1,56 @@
+---
+title: "CelebTweetAnalyzer"
+author: "Alex Bieniek"
+date: "February 24, 2019"
+output: pdf_document
+---
+
+```{r}
+if (FALSE) {
+  installed.packages("base64enc")
+  install.packages("twitteR", dependencies = TRUE)
+  install.packages("RCurl", dependencies = T)
+  install.packages("bitops", dependencies = T)
+  install.packages("plyr", dependencies = T)
+  install.packages('stringr', dependencies = T)
+  install.packages("NLP", dependencies = T)
+  install.packages("tm", dependencies = T)
+  install.packages("wordcloud", dependencies=T)
+  install.packages("RColorBrewer", dependencies=TRUE)
+  install.packages("reshape", dependencies=T)
+}
+  
+library(twitteR)
+library(bitops)
+library(RCurl)
+library(plyr)
+library(stringr)
+library(NLP)
+library(tm)
+library(RColorBrewer)
+library(wordcloud)
+library(reshape)
+```
+
+
+```{r}
+# load local textfiles listing key positive and negative words
+positiveWords = scan("positive-words.txt", what="", sep="\n")
+positiveWords = positiveWords[35:length(positiveWords)]
+negativeWords = scan("negative-words.txt", what="", sep="\n")
+negativeWords = negativeWords[35:length(negativeWords)]
+
+# set up twitter sesssion
+source("twitter_keys.R") # imports consumer_key, consumer_secret, access_key, and access_secret
+source("sentiment3.R")
+setup_twitter_oauth(consumer_key, consumer_secret,access_token, access_secret)
+```
+
+```{r}
+tweets_KW = searchTwitter("@KanyeWest", n=1e3, lang="en", resultType="recent")
+tweets_D  = searchTwitter("@Drake", n=1e3, lang="en", resultType="recent")
+tweets_AG = searchTwitter("@ArianaGrande", n=1e3, lang="en", resultType="recent")
+tweets_CB = searchTwitter("@IAmCardiB", n=1e3, lang="en", resultType="recent")
+tweets_LP = searchTwitter("@LilPump", n=1e3, lang="en", resultType="recent")
+tweets_NM = searchTwitter("@NickiMinaj", n=1e3, lang="en", resultType="recent")
+```

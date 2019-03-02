@@ -118,7 +118,7 @@ clearTweets <- function(tweets, excl) {
   
 
   return(corpus_clean)
-} 
+}
 
 
 ## capture all the output to a file.
