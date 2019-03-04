@@ -118,7 +118,7 @@ clearTweets <- function(tweets, excl) {
   
 
   return(corpus_clean)
-}
+} 
 
 
 ## capture all the output to a file.
@@ -376,4 +376,3 @@ Conduct multilevel analysis and calculate 95% confidence intervals, determine:
 
 ## Report section for a scientific publication
 Write a small section for a scientific publication, in which you report the results of the analyses, and explain the conclusions that can be drawn.
-

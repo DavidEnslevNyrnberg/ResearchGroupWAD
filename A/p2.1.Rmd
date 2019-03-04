@@ -1,0 +1,161 @@
+---
+title: "CelebTweetAnalyzer"
+author: "Alex Bieniek"
+date: "February 24, 2019"
+output: pdf_document
+---
+## Collecting Preliminary Data
+
+Set up libraries...
+```{r, echo=FALSE, message=FALSE, warning=FALSE, include = FALSE}
+if (FALSE) {
+  install.packages("base64enc")
+  install.packages("twitteR", dependencies = TRUE)
+  install.packages("RCurl", dependencies = T)
+  install.packages("bitops", dependencies = T)
+  install.packages("plyr", dependencies = T)
+  install.packages('stringr', dependencies = T)
+  install.packages("NLP", dependencies = T)
+  install.packages("tm", dependencies = T)
+  install.packages("wordcloud", dependencies=T)
+  install.packages("RColorBrewer", dependencies=TRUE)
+  install.packages("reshape", dependencies=T)
+}
+
+library(base64enc)
+library(twitteR)
+library(bitops)
+library(RCurl)
+library(plyr)
+library(stringr)
+library(NLP)
+library(tm)
+library(RColorBrewer)
+library(wordcloud)
+library(reshape)
+library(car)
+```
+
+Collect positive and negative words and related functions, set up twitter oauth...
+```{r, echo=FALSE, message=FALSE, warning=FALSE, include = FALSE}
+# load local textfiles listing key positive and negative words
+#taken from https://github.com/mjhea0/twitter-sentiment-analysis
+positive_words = scan('./data/positive-words.txt', what = 'character', comment.char=';') #read the positive words
+negative_words = scan('./data/negative-words.txt', what = 'character', comment.char=';') #read the negative words
+
+# set up twitter sesssion
+source("twitter_keys.R") # imports consumer_key, consumer_secret, access_key, and access_secret
+source("sentiment3.R")
+setup_twitter_oauth(consumer_key, consumer_secret,access_token, access_secret)
+```
+
+Collect tweets about celebrities...
+```{r, echo=FALSE, message=FALSE, warning=FALSE, include = FALSE}
+if (TRUE) {
+  tweets_KW = searchTwitter("@KanyeWest", n=1e3, lang="en", resultType="recent")
+  tweets_D  = searchTwitter("@Drake", n=1e3, lang="en", resultType="recent")
+  tweets_BS = searchTwitter("@ArianaGrande", n=1e3, lang="en", resultType="recent")
+  tweets_MC = searchTwitter("@IAmCardiB", n=1e3, lang="en", resultType="recent")
+  tweets_LP = searchTwitter("@LilPump", n=1e3, lang="en", resultType="recent")
+  tweets_NM = searchTwitter("@NickiMinaj", n=1e3, lang="en", resultType="recent")
+}
+```
+
+Parse tweets, collect sentiment scores from them...
+```{r, echo=FALSE, message=FALSE, warning=FALSE, include = FALSE}
+tweets_KW.parsed= laply(tweets_KW, function(t)t$getText())
+tweets_D.parsed  = laply(tweets_D,  function(t)t$getText()) 
+tweets_AG.parsed = laply(tweets_AG, function(t)t$getText()) 
+tweets_CB.parsed = laply(tweets_CB, function(t)t$getText()) 
+tweets_LP.parsed = laply(tweets_LP, function(t)t$getText()) 
+tweets_NM.parsed = laply(tweets_NM, function(t)t$getText()) 
+
+tweets_KW.analysis = score.sentiment(tweets_KW.parsed, positive_words, negative_words)
+tweets_D.analysis  = score.sentiment(tweets_D.parsed,  positive_words, negative_words)
+tweets_AG.analysis = score.sentiment(tweets_AG.parsed, positive_words, negative_words)
+tweets_CB.analysis = score.sentiment(tweets_CB.parsed, positive_words, negative_words)
+tweets_LP.analysis = score.sentiment(tweets_LP.parsed, positive_words, negative_words)
+tweets_NM.analysis = score.sentiment(tweets_NM.parsed, positive_words, negative_words)
+```
+
+Aggregate tweet scores, put into data frames...
+```{r, echo=FALSE, message=FALSE, warning=FALSE, include = FALSE}
+length(tweets_O)
+sem = data.frame(KW = tweets_KW.analysis$score,
+                 D  =  tweets_D.analysis$score,
+                 AG = tweets_AG.analysis$score,
+                 CB = tweets_CB.analysis$score,
+                 LP = tweets_LP.analysis$score,
+                 NM = tweets_NM.analysis$score)
+sem_frame = melt(sem, measured=c(tweets_KW.analysis$score,
+                                 tweets_D.analysis$score,
+                                 tweets_AG.analysis$score,
+                                 tweets_CB.analysis$score,
+                                 tweets_LP.analysis$score,
+                                 tweets_NM.analysis$score))
+names(sem_frame) <- c("candidate", "score")
+sem_frame$candidate <-factor(sem_frame$candidate, labels=c("KanyeWest",
+                                                           "Drake",
+                                                           "ArianaGrande",
+                                                           "IAmCardiB",
+                                                           "LilPump",
+                                                           "NickiMinaj"))
+```
+
+## Tweet Sentiment Analysis
+Is there a difference in the sentiment of the tweets related to the different celebrities? We inspect this question using context independent sentiment analysis of tweets about them. The data was collected as follows:
+ 1. We used the twitter api to collect the 1000 most recent tweets which contain the twitter tag of the celebrity of interest
+ 2. Punctuation and links were removed from the tweets
+ 3. Upon these "parsed" tweets, we counted the number of "positive" and "negative" words present in the tweet, as provided in lists for the assignment, and the tweets were given a sentiment score as a difference of the positive and negative word counts
+
+ Tweets about the following American music artists were collected:
+ - Kanye West
+ - Drake
+ - Ariana Grande
+ - Cardi B
+ - Lil Pump
+ - Nicki Minaj
+ 
+### Statistical Considerations:
+Making no assumptions, we would expect that all tweets about our celebrities have similar sentiment scores. That is, the sentiment scores found in tweets about celebrities have come from the same, broad distribution of sentiment scores in tweets about all celebrities. The alternative hypothesis would be that tweet sentiment scores come from different distributions when we sample tweets about the various celebrities.
+
+## Assessing Homogeneity of Variance
+```{r}
+leveneTest(score ~ candidate, sem_frame)
+```
+
+We use the Levene Test to assess homogeneity of variance. At an alpha value of .05, our p-value is less than our alpha value, so we do not believe that the tweet sentiment distributions from the various celebrities have homogeneous variances.
+
+## Graphical Examination of Means and Variations of Tweet Sentiment by Celebrity
+```{r}
+boxplot(score ~ candidate, sem_frame)
+par(mfrow=c(2,3))
+for (name in unique(sem_frame$candidate)) {
+  hist(sem_frame[sem_frame$candidate == name,]$score, breaks = seq(-8, 8, 1), 
+       main=paste("Tweet Sentiments for", name), xlab="sentiment score", ylim=c(0, 750))
+}
+```
+Above, we have produced visualizations of the sampled distributions of tweet sentiments about various American celebrity artists. They have different medians, levels of spread, and numbers of outliers. In particular:
+ - All celebrities were found to have a median neutral sentiment score for their sampled tweets except for Ariana Grande, who has a median +1 tweet sentiment
+ - Most celebrities have an interquartile range of 1, while Drake and Cardi B have an interquartile range of 2
+ - Most celebrities have outliers of similar scores, but:
+   - there is at least one tweet about Nicki Minaj with a sentiment score of +6, which isat least 2 sentiment points higher than all other tweets
+   - there is one or more tweets about Drake which have a sentiment score of -5, which is at least 1 point lower than all other tweets
+ - Distributions tend to center around neutral tweets, but some celebrities recieve far less neutral tweets than others:
+   - Lil Pump appears to reach ~550 neutral tweets
+   - Offset only reaches ~350 neutral tweets
+
+## Tweet Knowledge as Used to Describe Tweet Sentiment
+```{r}
+
+```
+
+This part of the assignment prompt feels unclear and will be saved for a later time.
+
+## Assessing Model Quality Using Tweet Knowledge as a Predictor
+
+This part of the assignment prompt feels unclear and will be saved for a later time.
+
+## Findings
+
+Through statistical significance tests and inspection of visualizations, we believe that the sentiment score distribution from tweets pertaining to various American celebrity artists do not come from the same distribution. The sampled distributions of sentiment scores about artists have different variances, median sentiment scores, and numbers of outliers. 
