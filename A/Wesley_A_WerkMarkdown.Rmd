@@ -1,0 +1,209 @@
+---
+title: "Report Template coursework assignment A - 2018"
+author: "Wesley Quispel (4014901)"
+date: "25/02/2019"
+output:
+  html_document:
+    df_print: paged
+  pdf_document:
+    fig_caption: yes
+    number_sections: yes
+subtitle: CS4125 Seminar Research Methodology for Data Science
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+setwd("/Users/wesleyquispel/Documents/Universiteit/2018-2019/p3-seminar") 
+# apple , note use / instead of \, which used by windows
+
+
+library(twitteR)
+library(RCurl)
+library(bitops)
+library(plyr)
+library(stringr)
+library(NLP)
+library(tm)
+library(RColorBrewer)
+library(wordcloud)
+library(reshape)
+
+library(Rcmdr)
+library(foreign)
+library(sm)
+library(car)
+
+library(tidyr)  # for wide to long format transformation of the data
+library(ggplot2)
+library(QuantPsyc) #include lm.beta()
+library(gmodels)
+library(pander) #for rendering output
+library(ez) #for ezANOVA
+```
+
+## Question 2 - Website visits (between groups - Two factors)
+```{r}
+# We use version 1
+data<-read.csv("./data/webvisit1.csv", header = TRUE)
+cat("Mean=", mean(data$pages), "\n", "SD=", sd(data$pages), "\n", "median=", median(data$pages), "\n")
+cat("Max=", max(data$pages), "\n", "Min=", min(data$pages))
+```
+
+### Conceptual model
+Make a conceptual model underlying this research question
+
+### Visual inspection
+Graphically examine the variation in page visits for different factors levels (e.g. histogram, density plot etc.) 
+
+
+```{r}
+hist(data$pages, xlab="Number of Pages", main="Histogram of distribution page visits")
+
+#d <-density(data$pages) #density plot
+#plot(d)
+```
+```{r}
+data$versionCat<-factor(data$version, levels = c(0:1), labels = c("Old","New"))
+data$portalCat<-factor(data$portal, levels = c(0:1), labels = c("Consumers","Companies"))
+
+sm.density.compare(data$pages, data$portal, xlab = "Number of Pages") 
+title(main="Number of pages per portal")
+legend('topright', legend=levels(data$portalCat), col=c('red', 'green'), lty=1:2, cex=0.8,             title="Portal", text.font=4, bg='lightblue')
+sm.density.compare(data$pages, data$versionCat, xlab = "Number of Pages") 
+title(main="Number of pages per version")
+legend('topright', legend=levels(data$versionCat), col=c('red', 'green'), lty=1:2, cex=0.8,
+       title="Version", text.font=4, bg='lightblue')
+```
+
+```{r}
+scatterplot(pages ~ portalCat, data = data, 
+            main="Scatterplot with extra features") 
+
+scatterplot(pages ~ user, data = data, 
+            main="Scatterplot with extra features") 
+
+scatterplot(pages ~ versionCat, data = data, 
+            main="Scatterplot with extra features") 
+```
+
+### Normality check
+Statistically test if variable page visits deviates from normal distribution
+
+
+```{r}
+shapiro.test(data$pages)
+```
+
+### Model analysis
+Conduct a model analysis, to examine the added values of adding 2 factors and interaction between the factors in the model to predict page visits.
+
+
+```{r}
+#include your code and output in the document
+CrossTable(data$portal, data$pages, prop.r=FALSE, prop.c = FALSE, 
+           prop.t = FALSE, 
+           prop.chisq=FALSE, format = "SPSS",  
+           fisher = FALSE, chisq = TRUE, 
+           expected = FALSE, sresid = FALSE)
+```
+```{r}
+#include your code and output in the document
+CrossTable(data$version, data$pages, prop.r=FALSE, prop.c = FALSE, 
+           prop.t = FALSE, 
+           prop.chisq=FALSE, format = "SPSS",  
+           fisher = FALSE, chisq = TRUE, 
+           expected = FALSE, sresid = FALSE)
+```
+
+Linear model with
+```{r}
+model0 <- lm(data$pages ~ 1, data=data)
+model1 <- lm(data$pages ~ data$portal, data=data)
+model2 <- lm(data$pages ~ data$version, data=data)
+anova(model0, model1, test = "F")
+anova(model0, model2, test = "F")
+cat("Summary: \n ---------------------------------------------------- \n")
+summary(model1)
+summary(model2)
+cat("Anova: \n ---------------------------------------------------- \n")
+Anova(model1)
+Anova(model2)
+```
+```{r}
+model0 <- lm(data$pages ~ 1 , data = data, na.action = na.exclude)
+model1 <- lm(data$pages ~ portal , data = data, na.action = na.exclude)
+model2 <- lm(data$pages ~ version , data = data, na.action = na.exclude)
+model3 <- lm(data$pages ~ portal + version , data = data, na.action = na.exclude)
+model4 <- lm(data$pages ~ portal + version + portal:version , data = data, na.action = na.exclude)
+anova(model0,model1) 
+anova(model0,model2) 
+anova(model3,model4) 
+summary(model4) 
+anova(model4)
+```
+
+```{r}
+data$unstandardizedResiduals1 <- resid(model1)
+hp <- ggplot(data, aes(x= unstandardizedResiduals1)) + geom_histogram() + labs(title="distribution residuals") 
+hp + facet_grid(.~portalCat)
+```
+```{r}
+data$unstandardizedResiduals2 <- resid(model2)
+hp <- ggplot(data, aes(x= unstandardizedResiduals2)) + geom_histogram() + labs(title="distribution residuals") 
+hp + facet_grid(.~versionCat)
+```
+
+###Simple effect analysis
+If the analysis shows a significant two-way interaction effect, conduct a Simple Effect analysis to explore this interaction effect in more detail.It helps first to look at the means in a figure
+
+
+```{r}
+data$simple <- interaction(data$portal, data$version)
+contractSimple <- c(1,-1,0,0)
+contractComplex <- c(0,0,1,-1)
+SimpleEff <- cbind(contractSimple,contractComplex)
+contrasts(data$simple) <- SimpleEff
+simpleEffectModel <- aov(pages ~ simple , data = data, na.action = na.exclude) 
+summary.lm(simpleEffectModel)
+```
+
+
+### Report section for a scientific publication
+Write a small section for a scientific publication, in which you report the results of the analyses, and explain the conclusions that can be drawn.
+
+**Independent variables.** Version used (old, new), Portal used (consumers, companies). Any combination thereof ((old:consumer), (old:companies), (new:consumers), (new:companies))
+
+**Dependent variables.** Number of pages visited by user.
+
+**Null hypothesis.** There is no observed difference in the number of pages visited based on either the versions, the portals, or a combination thereof used. The observed difference in the sample is based on a sampling error and there is no observed difference in the entire population.
+
+**Alternative hypothesis.** The observed difference in the sample is a real effect plus some change variation.
+
+
+# Part 3 - Multilevel model
+
+## Visual inspection
+Use graphics to inspect the distribution of the score, and relationship between session and score
+
+
+```{r}
+#include your code and output in the document
+```
+
+## Multilevel analysis
+Conduct multilevel analysis and calculate 95% confidence intervals, determine:
+
+* If session has an impact on people score
+* If there is significant variance between the participants in their score
+
+
+```{r}
+#include your code and output in the document
+```
+
+## Report section for a scientific publication
+Write a small section for a scientific publication, in which you report the results of the analyses, and explain the conclusions that can be drawn.
+
