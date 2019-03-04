@@ -42,6 +42,7 @@ library(QuantPsyc) #include lm.beta()
 library(gmodels)
 library(pander) #for rendering output
 library(ez) #for ezANOVA
+library(nlme)
 ```
 
 ## Question 2 - Website visits (between groups - Two factors)
@@ -72,7 +73,8 @@ data$portalCat<-factor(data$portal, levels = c(0:1), labels = c("Consumers","Com
 sm.density.compare(data$pages, data$portal, xlab = "Number of Pages") 
 title(main="Number of pages per portal")
 legend('topright', legend=levels(data$portalCat), col=c('red', 'green'), lty=1:2, cex=0.8,             title="Portal", text.font=4, bg='lightblue')
-sm.density.compare(data$pages, data$versionCat, xlab = "Number of Pages") 
+
+sm.density.compare(data$pages, data$version, xlab = "Number of Pages") 
 title(main="Number of pages per version")
 legend('topright', legend=levels(data$versionCat), col=c('red', 'green'), lty=1:2, cex=0.8,
        title="Version", text.font=4, bg='lightblue')
@@ -174,7 +176,7 @@ summary.lm(simpleEffectModel)
 ### Report section for a scientific publication
 Write a small section for a scientific publication, in which you report the results of the analyses, and explain the conclusions that can be drawn.
 
-**Independent variables.** Version used (old, new), Portal used (consumers, companies). Any combination thereof ((old:consumer), (old:companies), (new:consumers), (new:companies))
+**Independent variables.** Version used (old, new), Portal used (consumers, companies). Interaction by any combination thereof ((old:consumer), (old:companies), (new:consumers), (new:companies))
 
 **Dependent variables.** Number of pages visited by user.
 
@@ -185,12 +187,38 @@ Write a small section for a scientific publication, in which you report the resu
 
 # Part 3 - Multilevel model
 
+```{r}
+ml_data<-read.csv("./data/set1.csv", header = TRUE)
+```
+
 ## Visual inspection
 Use graphics to inspect the distribution of the score, and relationship between session and score
 
 
 ```{r}
 #include your code and output in the document
+hist(ml_data$score, xlab="Score", main="Distribution of score")
+hist(ml_data$session, xlab="Session", main="Distribution of sessions")
+# scatterplot(ml_data$session, ml_data$score, xlab="Sessions", ylab="Score", main="Relation between score and sessions")
+# pairs(~Subject+session+score,data=ml_data,main="Scatterplot Matrix")
+# 
+# 
+# model0 <- lm(ml_data$score ~ ml_data$Subject , data = ml_data, na.action = na.exclude)
+# model1 <- lm(ml_data$score ~ ml_data$session , data = ml_data, na.action = na.exclude)
+# summary(model0) 
+# summary(model1) 
+
+range_vec <- c(0:9)
+new_data <- ml_data[ml_data$Subject %in% range_vec, ]
+
+scatter <-ggplot(new_data, aes(x=session, y=score, color=Subject))
+scatter +geom_point() + geom_smooth(method="lm", se= F) + scale_color_gradientn(colours = rainbow(100))
+
+scatter <-ggplot(ml_data, aes(x=session, y=score, color=Subject))
+scatter +geom_point() + geom_smooth(method="lm", se= F) + scale_color_gradientn(colours = rainbow(100))
+
+# scatter <- qplot(x = session, y = score, color = Subject, data =  ml_data, geom = "point")
+# scatter + scale_fill_gradient(heat.colors(unique(ml_data$Subject)))
 ```
 
 ## Multilevel analysis
@@ -202,6 +230,22 @@ Conduct multilevel analysis and calculate 95% confidence intervals, determine:
 
 ```{r}
 #include your code and output in the document
+
+randomInterceptOnly <- lme(score ~ 1, data = ml_data, 
+                           random = ~1|Subject, method = "ML")
+summary(randomInterceptOnly)
+
+
+intervals(randomInterceptOnly, 0.95)
+```
+```{r}
+randomInterceptSession <- lme(score ~ session, 
+                              data = ml_data, random = ~1|Subject, method = "ML")
+summary(randomInterceptSession)
+
+anova(randomInterceptOnly,randomInterceptSession)
+```
+```{r}
 ```
 
 ## Report section for a scientific publication
