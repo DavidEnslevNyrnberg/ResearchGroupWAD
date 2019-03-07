@@ -16,7 +16,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r}
-setwd("/Users/wesleyquispel/Documents/Universiteit/2018-2019/p3-seminar") 
+#setwd("/Users/wesleyquispel/Documents/Universiteit/2018-2019/p3-seminar")
 # apple , note use / instead of \, which used by windows
 
 
@@ -57,7 +57,7 @@ cat("Max=", max(data$pages), "\n", "Min=", min(data$pages))
 Make a conceptual model underlying this research question
 
 ### Visual inspection
-Graphically examine the variation in page visits for different factors levels (e.g. histogram, density plot etc.) 
+Graphically examine the variation in page visits for different factors levels (e.g. histogram, density plot etc.)
 
 
 ```{r}
@@ -70,25 +70,25 @@ hist(data$pages, xlab="Number of Pages", main="Histogram of distribution page vi
 data$versionCat<-factor(data$version, levels = c(0:1), labels = c("Old","New"))
 data$portalCat<-factor(data$portal, levels = c(0:1), labels = c("Consumers","Companies"))
 
-sm.density.compare(data$pages, data$portal, xlab = "Number of Pages") 
+sm.density.compare(data$pages, data$portal, xlab = "Number of Pages")
 title(main="Number of pages per portal")
 legend('topright', legend=levels(data$portalCat), col=c('red', 'green'), lty=1:2, cex=0.8,             title="Portal", text.font=4, bg='lightblue')
 
-sm.density.compare(data$pages, data$version, xlab = "Number of Pages") 
+sm.density.compare(data$pages, data$version, xlab = "Number of Pages")
 title(main="Number of pages per version")
 legend('topright', legend=levels(data$versionCat), col=c('red', 'green'), lty=1:2, cex=0.8,
        title="Version", text.font=4, bg='lightblue')
 ```
 
 ```{r}
-scatterplot(pages ~ portalCat, data = data, 
-            main="Scatterplot with extra features") 
+scatterplot(pages ~ portalCat, data = data,
+            main="Scatterplot with extra features")
 
-scatterplot(pages ~ user, data = data, 
-            main="Scatterplot with extra features") 
+scatterplot(pages ~ user, data = data,
+            main="Scatterplot with extra features")
 
-scatterplot(pages ~ versionCat, data = data, 
-            main="Scatterplot with extra features") 
+scatterplot(pages ~ versionCat, data = data,
+            main="Scatterplot with extra features")
 ```
 
 ### Normality check
@@ -105,18 +105,18 @@ Conduct a model analysis, to examine the added values of adding 2 factors and in
 
 ```{r}
 #include your code and output in the document
-CrossTable(data$portal, data$pages, prop.r=FALSE, prop.c = FALSE, 
-           prop.t = FALSE, 
+CrossTable(data$portal, data$pages, prop.r=FALSE, prop.c = FALSE,
+           prop.t = FALSE,
            prop.chisq=FALSE, format = "SPSS",  
-           fisher = FALSE, chisq = TRUE, 
+           fisher = FALSE, chisq = TRUE,
            expected = FALSE, sresid = FALSE)
 ```
 ```{r}
 #include your code and output in the document
-CrossTable(data$version, data$pages, prop.r=FALSE, prop.c = FALSE, 
-           prop.t = FALSE, 
+CrossTable(data$version, data$pages, prop.r=FALSE, prop.c = FALSE,
+           prop.t = FALSE,
            prop.chisq=FALSE, format = "SPSS",  
-           fisher = FALSE, chisq = TRUE, 
+           fisher = FALSE, chisq = TRUE,
            expected = FALSE, sresid = FALSE)
 ```
 
@@ -140,21 +140,21 @@ model1 <- lm(data$pages ~ portal , data = data, na.action = na.exclude)
 model2 <- lm(data$pages ~ version , data = data, na.action = na.exclude)
 model3 <- lm(data$pages ~ portal + version , data = data, na.action = na.exclude)
 model4 <- lm(data$pages ~ portal + version + portal:version , data = data, na.action = na.exclude)
-anova(model0,model1) 
-anova(model0,model2) 
-anova(model3,model4) 
-summary(model4) 
+anova(model0,model1)
+anova(model0,model2)
+anova(model3,model4)
+summary(model4)
 anova(model4)
 ```
 
 ```{r}
 data$unstandardizedResiduals1 <- resid(model1)
-hp <- ggplot(data, aes(x= unstandardizedResiduals1)) + geom_histogram() + labs(title="distribution residuals") 
+hp <- ggplot(data, aes(x= unstandardizedResiduals1)) + geom_histogram() + labs(title="distribution residuals")
 hp + facet_grid(.~portalCat)
 ```
 ```{r}
 data$unstandardizedResiduals2 <- resid(model2)
-hp <- ggplot(data, aes(x= unstandardizedResiduals2)) + geom_histogram() + labs(title="distribution residuals") 
+hp <- ggplot(data, aes(x= unstandardizedResiduals2)) + geom_histogram() + labs(title="distribution residuals")
 hp + facet_grid(.~versionCat)
 ```
 
@@ -168,7 +168,7 @@ contractSimple <- c(1,-1,0,0)
 contractComplex <- c(0,0,1,-1)
 SimpleEff <- cbind(contractSimple,contractComplex)
 contrasts(data$simple) <- SimpleEff
-simpleEffectModel <- aov(pages ~ simple , data = data, na.action = na.exclude) 
+simpleEffectModel <- aov(pages ~ simple , data = data, na.action = na.exclude)
 summary.lm(simpleEffectModel)
 ```
 
@@ -201,12 +201,12 @@ hist(ml_data$score, xlab="Score", main="Distribution of score")
 hist(ml_data$session, xlab="Session", main="Distribution of sessions")
 # scatterplot(ml_data$session, ml_data$score, xlab="Sessions", ylab="Score", main="Relation between score and sessions")
 # pairs(~Subject+session+score,data=ml_data,main="Scatterplot Matrix")
-# 
-# 
+#
+#
 # model0 <- lm(ml_data$score ~ ml_data$Subject , data = ml_data, na.action = na.exclude)
 # model1 <- lm(ml_data$score ~ ml_data$session , data = ml_data, na.action = na.exclude)
-# summary(model0) 
-# summary(model1) 
+# summary(model0)
+# summary(model1)
 
 range_vec <- c(0:9)
 new_data <- ml_data[ml_data$Subject %in% range_vec, ]
@@ -231,7 +231,7 @@ Conduct multilevel analysis and calculate 95% confidence intervals, determine:
 ```{r}
 #include your code and output in the document
 
-randomInterceptOnly <- lme(score ~ 1, data = ml_data, 
+randomInterceptOnly <- lme(score ~ 1, data = ml_data,
                            random = ~1|Subject, method = "ML")
 summary(randomInterceptOnly)
 
@@ -239,7 +239,7 @@ summary(randomInterceptOnly)
 intervals(randomInterceptOnly, 0.95)
 ```
 ```{r}
-randomInterceptSession <- lme(score ~ session, 
+randomInterceptSession <- lme(score ~ session,
                               data = ml_data, random = ~1|Subject, method = "ML")
 summary(randomInterceptSession)
 
@@ -250,4 +250,3 @@ anova(randomInterceptOnly,randomInterceptSession)
 
 ## Report section for a scientific publication
 Write a small section for a scientific publication, in which you report the results of the analyses, and explain the conclusions that can be drawn.
-

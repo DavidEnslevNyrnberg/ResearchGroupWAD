@@ -8,7 +8,7 @@ output: pdf_document
 
 Set up libraries...
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, include = FALSE}
-if (FALSE) {
+if (TRUE) {
   install.packages("base64enc")
   install.packages("twitteR", dependencies = TRUE)
   install.packages("RCurl", dependencies = T)
@@ -55,7 +55,7 @@ if (TRUE) {
   tweets_KW = searchTwitter("@KanyeWest", n=1e3, lang="en", resultType="recent")
   tweets_D  = searchTwitter("@Drake", n=1e3, lang="en", resultType="recent")
   tweets_BS = searchTwitter("@ArianaGrande", n=1e3, lang="en", resultType="recent")
-  tweets_MC = searchTwitter("@IAmCardiB", n=1e3, lang="en", resultType="recent")
+  tweets_CB = searchTwitter("@IAmCardiB", n=1e3, lang="en", resultType="recent")
   tweets_LP = searchTwitter("@LilPump", n=1e3, lang="en", resultType="recent")
   tweets_NM = searchTwitter("@NickiMinaj", n=1e3, lang="en", resultType="recent")
 }
@@ -64,11 +64,11 @@ if (TRUE) {
 Parse tweets, collect sentiment scores from them...
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, include = FALSE}
 tweets_KW.parsed= laply(tweets_KW, function(t)t$getText())
-tweets_D.parsed  = laply(tweets_D,  function(t)t$getText()) 
-tweets_AG.parsed = laply(tweets_AG, function(t)t$getText()) 
-tweets_CB.parsed = laply(tweets_CB, function(t)t$getText()) 
-tweets_LP.parsed = laply(tweets_LP, function(t)t$getText()) 
-tweets_NM.parsed = laply(tweets_NM, function(t)t$getText()) 
+tweets_D.parsed  = laply(tweets_D,  function(t)t$getText())
+tweets_AG.parsed = laply(tweets_AG, function(t)t$getText())
+tweets_CB.parsed = laply(tweets_CB, function(t)t$getText())
+tweets_LP.parsed = laply(tweets_LP, function(t)t$getText())
+tweets_NM.parsed = laply(tweets_NM, function(t)t$getText())
 
 tweets_KW.analysis = score.sentiment(tweets_KW.parsed, positive_words, negative_words)
 tweets_D.analysis  = score.sentiment(tweets_D.parsed,  positive_words, negative_words)
@@ -80,7 +80,6 @@ tweets_NM.analysis = score.sentiment(tweets_NM.parsed, positive_words, negative_
 
 Aggregate tweet scores, put into data frames...
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, include = FALSE}
-length(tweets_O)
 sem = data.frame(KW = tweets_KW.analysis$score,
                  D  =  tweets_D.analysis$score,
                  AG = tweets_AG.analysis$score,
@@ -95,11 +94,11 @@ sem_frame = melt(sem, measured=c(tweets_KW.analysis$score,
                                  tweets_NM.analysis$score))
 names(sem_frame) <- c("candidate", "score")
 sem_frame$candidate <-factor(sem_frame$candidate, labels=c("KanyeWest",
-                                                           "Drake",
-                                                           "ArianaGrande",
-                                                           "IAmCardiB",
-                                                           "LilPump",
-                                                           "NickiMinaj"))
+         "Drake",
+         "ArianaGrande",
+         "IAmCardiB",
+         "LilPump",
+         "NickiMinaj"))
 ```
 
 ## Tweet Sentiment Analysis
@@ -115,7 +114,7 @@ Is there a difference in the sentiment of the tweets related to the different ce
  - Cardi B
  - Lil Pump
  - Nicki Minaj
- 
+
 ### Statistical Considerations:
 Making no assumptions, we would expect that all tweets about our celebrities have similar sentiment scores. That is, the sentiment scores found in tweets about celebrities have come from the same, broad distribution of sentiment scores in tweets about all celebrities. The alternative hypothesis would be that tweet sentiment scores come from different distributions when we sample tweets about the various celebrities.
 
@@ -131,7 +130,7 @@ We use the Levene Test to assess homogeneity of variance. At an alpha value of .
 boxplot(score ~ candidate, sem_frame)
 par(mfrow=c(2,3))
 for (name in unique(sem_frame$candidate)) {
-  hist(sem_frame[sem_frame$candidate == name,]$score, breaks = seq(-8, 8, 1), 
+  hist(sem_frame[sem_frame$candidate == name,]$score, breaks = seq(-8, 8, 1),
        main=paste("Tweet Sentiments for", name), xlab="sentiment score", ylim=c(0, 750))
 }
 ```
@@ -158,4 +157,4 @@ This part of the assignment prompt feels unclear and will be saved for a later t
 
 ## Findings
 
-Through statistical significance tests and inspection of visualizations, we believe that the sentiment score distribution from tweets pertaining to various American celebrity artists do not come from the same distribution. The sampled distributions of sentiment scores about artists have different variances, median sentiment scores, and numbers of outliers. 
+Through statistical significance tests and inspection of visualizations, we believe that the sentiment score distribution from tweets pertaining to various American celebrity artists do not come from the same distribution. The sampled distributions of sentiment scores about artists have different variances, median sentiment scores, and numbers of outliers.
