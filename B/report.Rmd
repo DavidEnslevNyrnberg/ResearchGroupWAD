@@ -1,0 +1,35 @@
+---
+title: "coursework B"
+author: "Alexander Bieniek, David Nyrnberg, Wesley Quispel"
+date: "March 15, 2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+data = read.csv('data.csv')
+```
+
+## RQ1: Improvement in Transfer Learning
+How much does transfer learning improve over typical non-transfer learning?
+
+```{r}
+
+```
+
+## RQ2: Effect of Learning Strategy
+What is the effect of different strategies to simultaneously learn one model from multiple TrD's?
+
+```{r}
+
+```
+
+## RQ3: Effect of Training Datasets
+What is the effect of the TrD’s on the final model performance?
+
+```{r}
+
+```
