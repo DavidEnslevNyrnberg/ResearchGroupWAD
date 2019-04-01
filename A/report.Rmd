@@ -85,7 +85,7 @@ In this section, we describe the types of independent variables that we will obs
 
 Set up libraries...
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, include = FALSE}
-if (FALSE) {
+if (TRUE) {
   install.packages("base64enc")
   install.packages("twitteR", dependencies = TRUE)
   install.packages("RCurl", dependencies = T)
