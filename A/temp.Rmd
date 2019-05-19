@@ -1,0 +1,29 @@
+---
+title: "Report Template coursework assignment A - 2019"
+author: "Alexander Bieniek, Wesley Quispel, David Nyrnberg"
+date: "04/02/2019"
+output:
+  pdf_document:
+    fig_caption: yes
+    number_sections: yes
+  word_document: default
+subtitle: CS4125 Seminar Research Methodology for Data Science
+bibliography: references.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+wow I'm so motivated [@Pasman2017]
+
+ptaootrnf
+arjifksejf
+gegsjihrger
+grdghdr
+rhgoergergherhg
+erg
+erg
+er
+gherho
+geoghehrig

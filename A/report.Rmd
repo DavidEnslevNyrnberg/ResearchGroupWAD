@@ -8,7 +8,7 @@ output:
     number_sections: yes
   word_document: default
 subtitle: CS4125 Seminar Research Methodology for Data Science
-bibliography: references.bib
+bibliography: "references.bib"
 ---
 
 ```{r setup, include=FALSE}
@@ -24,49 +24,65 @@ knitr::opts_chunk$set(echo = TRUE)
   Perhaps caffeine truly improves one's performance in their studies or work. However, we may also investigate the existence of a placebo effect on one's work ethic. We also investigate more complex effects of caffeine with its relationship on mental acuity, such as the influence of the caffeine-induced "crash", and caffeine tolerance, and possible relationships between caffeine effectiveness and amount of sleep.
 
 ## Theory
-  Academics have performed a host of analyses on the effects of caffeine on cognitive performance.  For example, a study by Nehlig at UDS found that caffeine changes memory performance in nuanced ways, and it likely does not change the aggregation of long-term memory [@Neglig2010]. The study concluded that "caffeine cannot be considered a 'pure' cognitive enhancer", although it may indirectly influence, and possibly enhance, one's cognitive performance.[@Neglig2010]. Another study by Pasman et al. found that, when taking cognition tests, scores of subjects did not improve, but the tests were completed "approximately 10% faster" [@Pasman2017]. The findings of these studies suggest that, while caffeine may not directly improve cognitive performance, indirect factors may still lead users to enjoy increased efficiency when doing their work.
+  Academics have performed a host of analyses on the effects of caffeine on cognitive performance.  For example, a study by Nehlig at UDS found that caffeine changes memory performance in nuanced ways, and it likely does not change the aggregation of long-term memory [@Nehlig2010]. The study concluded that "caffeine cannot be considered a 'pure' cognitive enhancer", although it may indirectly influence, and possibly enhance, one's cognitive performance.[@Nehlig2010]. Another study by Pasman et al. found that, when taking cognition tests, scores of subjects did not improve, but the tests were completed "approximately 10% faster" [@Pasman2017]. The findings of these studies suggest that, while caffeine may not directly improve cognitive performance, indirect factors may still lead users to enjoy increased efficiency when doing their work.
 
-## Research Questions
-Put succinctly, here are some of the questions that we investigate in this experiment:
-- Does caffeine intake change one's mental acuity?
-- Does the "caffeine crash", or the perceived exhaustion after wearing off of caffeine, change one's mental acuity?
-- Does there exist a placebo affect in caffeine intake and one's mental acuity?
-- Does caffeine tolerance change the effectiveness of a single dose of caffeine?
-- Does one's recent amount of sleep change the effectiveness of caffeine at changing one's mental acuity?
+## Research Question
+  The question which we investigate with our true experiment is the following: Does caffeine intake increase the mental acuity of a student?
 
 ## Participants
   For convenience and consistency, the experiment will use students from TUDelft as participants. A sample from this population would likely generalize to broader student populations for the effects of caffeine intake. We can also find various levels of caffeine intake habits and regular sleep amounts. Lastly, because the students belong to the same university, we can expect that, with a lower variance in mental acuity, a smaller sample size could suffice for testing of statistical significance.
   One thing to consider is that, because TUDelft is a linguistically diverse university, we can make no assumptions about the language backgrounds of the students. As such, it is important to test subjects with means independent of reading ability, domain experience, etc.
   Administering of caffeine shall be transparent and consentual. Caffeine will be administered in commercially available forms and otherwise ordinary forms, with the possibility of caffeine-free doses.
 
+\pagebreak
+
 ## Conceptual Model
 **Dependent Variable: reading test score**
+
 Mental acuity is difficult to measure, so we will approximate it by administering a brief intelligence examination. In particular, the subject will be given an IQ test, which can be used as an unbiased approximation of the mentual acuity of a subject.
 
-**Independent Variables:**  
+**Independent Variables:**
+
 * Amount of Administered Caffeine (in mg)  
 * Duration Since Caffeine Dose  
 
-**Mediating Variables:**  
-* Caffeine Tolerance (as approximated by amount of caffeine per day)  
+**Mediating Variables:**
+
 * Average Sleep Amount (in Hours)  
 
-**Moderating Variables:**  
+**Moderating Variables:**
+
+* Caffeine Tolerance (as approximated by amount of caffeine per day)  
 * Percieved Inake of Caffeine  (Placebo or No Placebo)
 
+<br/>
+![Conceptual Model](figures/caffeineConceptualModel.jpg)
+<br/>
+
+\pagebreak
+
 ## Experimental Design
+  Our experiment is designed to detect effects of caffeine on mental acuity, and see how the effects might depend on the time since administration. We use a factorial design to consider different combinations of factors.
+
+
+<br/>
+![Factorial Experiment Design](figures/caffeineExperimentalDesign.jpg)
+<br/>
+  
+  
 The experiment explores the change in mental accuity as described by various factors around caffeine intake. There are many variables which many complicate and influence the change in mental accuity, such as caffeine tolerance and duration since dose, and these variables will be tested in experiments where other variables are controlled.
 
 ## Experimental Procedure
-For the colection of data from test subjects:  
-1. Randomly sample a test subject from a place of study, and preemptively, randomly assign treatment to the subject  
- * treatment would be in the form of a dose of caffeine, a placebo dose of caffeine, or no dose of caffeine  
- * We would need to find people who have not had any caffeine yet on the given day  
-2. Collect some preliminary information about the subject, including estimated sleep amount and estimated caffeine intake per day  
-3. administer a waiting period for the subject to go about other activities and allow the caffeine to kick in and/or wear off  
+For the colection of data from test subjects:
+
+1. Randomly sample a test subject from a place of study, and preemptively, randomly assign treatment to the subject
+ * treatment would be in the form of a dose of caffeine, a placebo dose of caffeine, or no dose of caffeine
+ * We would need to find people who have not had any caffeine yet on the given day
+2. Collect some preliminary information about the subject, including estimated sleep amount and estimated caffeine intake per day
+3. administer a waiting period for the subject to go about other activities and allow the caffeine to kick in and/or wear off
  * Duration of waiting period will be influenced by academic literature about caffeine
-4. After the waiting period, administer the IQ test  
- * The test should be realistically impossible to complete in the given amount of time to avoid statistically   meaningless score distributions  
+4. After the waiting period, administer the IQ test
+ * The test should be realistically impossible to complete in the given amount of time to avoid statistically   meaningless score distributions
 
 ## Experiments and Suggested Statistical Analyses
 In this section, we describe the types of independent variables that we will observe and what statistical tests would allow for hypothesis testing:  
@@ -100,6 +116,15 @@ library(plyr)
 library(stringr)
 library(car)
 ```
+
+\pagebreak
+
+### Conceptual Model
+Our tweet analysis seeks to answer the following question: Is there a difference in the sentiment of the tweets related to the different celebrities? This question is explored in the following conceptual model.
+
+<br/>
+![Conceptual Model for Tweet Sentiment Analysis](figures/tweetConceptualModel.jpg)
+<br/>
 
 ### Collecting Preliminary Data
 Collect positive and negative words and related functions, set up twitter oauth...
@@ -197,7 +222,7 @@ na.action = na.exclude)
 anova(tweets_lm0, tweets_lm1)
 ```
 
-Using the ANOVA function in R, we find a p-value which is less than 0.05. With that, we reject the hypothesis that the sentiment score of a tweet cannot be predicted by knowing which celebrity the tweet pertains to.
+Using the ANOVA function in R, we find a p-value which is less than 0.05. With that, we reject the hypothesis that the sentiment score of a tweet does not depend on which celebrity the tweet pertains to.
 
 ### Assessing Model Quality Using Tweet Knowledge as a Predictor
 ```{r}
@@ -226,17 +251,27 @@ if (F) {
 library(gmodels)
 
 visits = read.csv("data/webvisit1.csv", header = TRUE)
+visits$version[visits$version==0] = "Old"
+visits$version[visits$version==1] = "New"
+visits$portal[visits$portal==0] = "Consumer"
+visits$portal[visits$portal==1] = "Company"
 ```
 
 ### Conceptual model
 We are tasked with analyzing the results of an A-B study of a webserver as administered in two different versions to two different groups. Also, notice that we are using the webvisit dataset 1. Through this analysis, we investigate linear modeling between groups of two different factors:
 
-**Independent Variables:**  
-* Version of webserver (0 or 1)  
+<br/>
+![Conceptual Model for Webage Visit Analysis](figures/webpageConceptualModel.jpg)
+<br/>
+
+**Independent Variables:**
+
+* Version of webserver (Old or New)  
 * Type of User (0=consumer, 1=company)  
 * All combinations of the previously listed independent variables
 
-**Dependent Variables:**  
+**Dependent Variables:**
+
 * Number of pages visited
 
 In this analysis, we inspect whether the independent variables, individually and/or in combination, effected the numper of pages visited:
@@ -370,17 +405,24 @@ library(ppcor)
 airfare <- read.csv(file="data/airfare.csv", header=T)
 ```
 
+\pagebreak
+
 ### Conceptual model
-For a self-guided linear regression analysis, we investigate a dataset which records airfares from ities to cities. We would like to see if the chosen independent variables can be used to predict the price of a ticket from one city to nother. For the analysis:
+For a self-guided linear regression analysis, we investigate a dataset which records airfares from cities to cities. We would like to see if the chosen independent variables can be used to predict the price of a ticket from one city to nother. For the analysis:
 
 **Dependent Variable: Average Fare**
+
 The average price of the ticket to get from City1 to City2
 
-**Independent Variables:**  
-* 
+**Independent Variables:**
+
 * Distance - the distance between City1 and City2 
 * Average Weekly Passengers - the average number of passengers that fly from City1 to City2 per week  
-* Lead Share - the Percentage of the flights from City1 to City2 which are served through the leading airline of the route
+* Lead Share Percentage - the Percentage of the flights from City1 to City2 which are served through the leading airline of the route
+
+<br/>
+![Conceptual Model for Airfare Analysis](figures/airfareConceptualModel.jpg)
+<br/>
 
 ### Visual inspection
 Graphical analysis of the distribution of the dependent variable, e.g. histogram, density plot
@@ -461,20 +503,35 @@ We performed a multiple regression on the average airfare of a route from one ci
 ## Question 4 - Logistic regression analysis
 Set up libraries, collect data...
 ```{r, echo=FALSE}
+if (F) {
+  install.packages("caret")  
+}
+
+library(caret)
 library(gmodels)
+library(ggpubr)
+library(ggExtra)
 
 shf <- read.csv("data/logisticDataStatureHandFoot.csv")
 ```
+
+\pagebreak
 
 ### Conceptual model
 In this logistic regression analysis, we consider some size measurements of subjects and look for a relationship between these measurements and the sex of the subject. Of course, we assume that the lengths of the hands and feet of our subjects as well as their sexes are independent of those observations in other subjects.
 
 **Dichotomous Dependent Variable: sex**
+
 Note: the experiment collected and recorded this variable as a "gender". We shall call this variable "sex" because we believe that this is what the experimenters were actually observing.
 
-**Independent Variables:**  
+**Independent Variables:**
+
 * Hand Length (in mm)  
 * Foot Length (in mm)
+
+<br/>
+![Conceptual Model for Sex Prediction](figures/logisticConceptualModel.jpg)
+<br/>
 
 The Null Hypothesis would suggest that the independent variables, each individually and combinations of them, do not have statistically significant trends such that we can reliably predict the sex of a new subject given their feature size measurements. The Alternative Hypothesis, then, would be to say that we can reliably attempt to predict the sex of a subject given their feature size measurements because we find different sexes to exhibit different trends in these measurements. 
 
@@ -492,8 +549,8 @@ plot(p1Q4)
 
 ### Logistic Regression
 ```{r, echo=FALSE}
-shf$sex[shf$gender ==1] <- 0
-shf$sex[shf$gender ==2] <- 1
+shf$sex[shf$gender==1] <- 0
+shf$sex[shf$gender==2] <- 1
 
 model0 <- glm(sex ~ 1, data = shf, family = binomial())
 model1 <- glm(sex ~ handLen, data = shf, family = binomial())
@@ -509,10 +566,12 @@ We use of ANOVA for the comparison of our models:
 * Similarly, we find that additionally adding Foot Length as a predictor improves our model. Statistically, the chance that Foot Length as an indicator improves our previous model, with just Hand Length as an indicator, without it being a truly good indicator is 3.954e-8: We reject that Foot Length is independent of the sex of the subject.  
 
 ### Visualization of Results
-```{r, echo=FALSE}
+```{r}
 sexProbs = predict.glm(model2, shf, type="response")
 sexPreds = sapply(sexProbs, function(x) as.integer(x > .5))
-paste("training accuracy:", sum(diag(as.matrix(table(shf$sex, sexPreds))))/length(sexPreds))
+sexTable = table(sexPreds, shf$sex)
+sexConfusionMatrix = confusionMatrix(sexTable)
+sexConfusionMatrix
 ```
 
 ### Report section for a scientific publication
