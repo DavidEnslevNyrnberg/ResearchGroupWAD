@@ -535,12 +535,13 @@ plot(p1Q4)
 
 ### Logistic Regression
 ```{r}
-shf$sex[shf$gender==1] <- 0
-shf$sex[shf$gender==2] <- 1
+shf$sex[shf$gender==1] <- 'male'
+shf$sex[shf$gender==2] <- 'female'
+shf$sex = factor(shf$sex)
 
-model0 <- glm(sex ~ 1, data = shf, family = binomial())
-model1 <- glm(sex ~ handLen, data = shf, family = binomial())
-model2 <- glm(sex ~ handLen + footLen, data = shf, family = binomial())
+model0 = glm(sex ~ 1, data = shf, family = binomial())
+model1 = glm(sex ~ handLen, data = shf, family = binomial())
+model2 = glm(sex ~ handLen + footLen, data = shf, family = binomial())
 
 anova(model0, model1, model2, test="Chisq")
 #pander(anova(model0,model1,model2,test = "Chisq" ),
@@ -554,8 +555,11 @@ We use of ANOVA for the comparison of our models:
 ### Visualization of Results
 ```{r}
 sexProbs = predict.glm(model2, shf, type="response")
-sexPreds = sapply(sexProbs, function(x) as.integer(x > .5))
-sexTable = table(sexPreds, shf$sex)
+sexPreds = sapply(sexProbs, function(x) if (x<.5) 'male' else 'female')
+sexPreds = factor(sexPreds)
+
+dnn = c('predicted', 'observed')
+sexTable = table(sexPreds, shf$sex, dnn=dnn)
 sexConfusionMatrix = confusionMatrix(sexTable)
 sexConfusionMatrix
 ```
