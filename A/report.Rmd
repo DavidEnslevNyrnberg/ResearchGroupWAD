@@ -27,7 +27,7 @@ knitr::opts_chunk$set(echo = TRUE)
   Academics have performed a host of analyses on the effects of caffeine on cognitive performance.  For example, a study by Nehlig at UDS found that caffeine changes memory performance in nuanced ways, and it likely does not change the aggregation of long-term memory [@Nehlig2010]. The study concluded that "caffeine cannot be considered a 'pure' cognitive enhancer", although it may indirectly influence, and possibly enhance, one's cognitive performance.[@Nehlig2010]. Another study by Pasman et al. found that, when taking cognition tests, scores of subjects did not improve, but the tests were completed "approximately 10% faster" [@Pasman2017]. The findings of these studies suggest that, while caffeine may not directly improve cognitive performance, indirect factors may still lead users to enjoy increased efficiency when doing their work.
 
 ## Research Question
-  The question which we investigate with our true experiment is the following: Does caffeine intake increase the mental acuity of a student?
+  The question which we investigate with our true experiment is the following: Does caffeine intake improve a student's testing ability?
 
 ## Participants
   For convenience and consistency, the experiment will use students from TUDelft as participants. A sample from this population would likely generalize to broader student populations for the effects of caffeine intake. We can also find various levels of caffeine intake habits and regular sleep amounts. Lastly, because the students belong to the same university, we can expect that, with a lower variance in mental acuity, a smaller sample size could suffice for testing of statistical significance.
@@ -37,23 +37,17 @@ knitr::opts_chunk$set(echo = TRUE)
 \pagebreak
 
 ## Conceptual Model
-**Dependent Variable: reading test score**
+**Dependent Variable:** IQ Test Score
 
-Mental acuity is difficult to measure, so we will approximate it by administering a brief intelligence examination. In particular, the subject will be given an IQ test, which can be used as an unbiased approximation of the mentual acuity of a subject.
+We would like to see if caffeine intake improves one's test taking abilities. In particular, the subject will be given an IQ test, which can be used as an unbiased approximation of the mentual acuity of a subject. An IQ test would be the most fair form of judging a difference in test performance, independent of the background of the subject.
 
-**Independent Variables:**
+**Independent Variable:** Caffeine Administration (real or placebo)
 
-* Amount of Administered Caffeine (in mg)  
-* Duration Since Caffeine Dose  
+**Mediating Variables:** Mental Acuity  
 
-**Mediating Variables:**
+Mental acuity is perhaps the variable that we're more interested in, but there's no real way to measure this.
 
-* Average Sleep Amount (in Hours)  
-
-**Moderating Variables:**
-
-* Caffeine Tolerance (as approximated by amount of caffeine per day)  
-* Percieved Inake of Caffeine  (Placebo or No Placebo)
+**Moderating Variable:** Amount of Sleep
 
 <br/>
 ![Conceptual Model](figures/caffeineConceptualModel.jpg)
@@ -62,35 +56,27 @@ Mental acuity is difficult to measure, so we will approximate it by administerin
 \pagebreak
 
 ## Experimental Design
-  Our experiment is designed to detect effects of caffeine on mental acuity, and see how the effects might depend on the time since administration. We use a factorial design to consider different combinations of factors.
+Our experiment is designed to watch test scores as related to caffeine ingestion. There will be two randomly assigned treatments, where subjects receive coffee with either 0mg of caffeine or 100mg of caffeine.
 
 
 <br/>
 ![Factorial Experiment Design](figures/caffeineExperimentalDesign.jpg)
 <br/>
-  
-  
-The experiment explores the change in mental accuity as described by various factors around caffeine intake. There are many variables which many complicate and influence the change in mental accuity, such as caffeine tolerance and duration since dose, and these variables will be tested in experiments where other variables are controlled.
 
 ## Experimental Procedure
 For the colection of data from test subjects:
 
 1. Randomly sample a test subject from a place of study, and preemptively, randomly assign treatment to the subject
- * treatment would be in the form of a dose of caffeine, a placebo dose of caffeine, or no dose of caffeine
+ * Treatment is either a 100mg dose of caffeine or a 0mg dose of caffeine, both served through a cup of coffee
  * We would need to find people who have not had any caffeine yet on the given day
-2. Collect some preliminary information about the subject, including estimated sleep amount and estimated caffeine intake per day
-3. administer a waiting period for the subject to go about other activities and allow the caffeine to kick in and/or wear off
+2. Collect some preliminary information about the subject, including estimated sleep amount
+3. administer a waiting period for the subject to go about other activities and allow the caffeine to kick in
  * Duration of waiting period will be influenced by academic literature about caffeine
 4. After the waiting period, administer the IQ test
- * The test should be realistically impossible to complete in the given amount of time to avoid statistically   meaningless score distributions
+ * The test should be realistically impossible to complete in the given amount of time to avoid statistically meaningless score distributions
 
 ## Experiments and Suggested Statistical Analyses
-In this section, we describe the types of independent variables that we will observe and what statistical tests would allow for hypothesis testing:  
-1. Effect of Caffeine Intake on Mental Accuity -> two-sample t-statistic  
-2. Placebo Effect of Caffeine Intake -> two-sample t-statistic  
-2. Effectiveness of Caffeine Intake Over Time -> Regression Analysis  
-3. Influence of Caffeine Tolerance on Caffeine Effectiveness -> Regression Analysis  
-3. Influence of Sleep on Caffeine Effectiveness -> Multiple Regression Analysis  
+To test the effects of caffeine intake on mental acuity, we would use a two-sample t-test.
 
 
 
@@ -100,7 +86,7 @@ In this section, we describe the types of independent variables that we will obs
 #Part 2 - Generalized linear models
 ## Question 1: Twitter Sentiment Analysis (Between groups - single factor)
 Set up libraries...
-```{r, echo=FALSE}
+```{r}
 if (F) {
   install.packages("base64enc", dependencies=T)
   install.packages("twitteR", dependencies=T)
@@ -128,7 +114,7 @@ Our tweet analysis seeks to answer the following question: Is there a difference
 
 ### Collecting Preliminary Data
 Collect positive and negative words and related functions, set up twitter oauth...
-```{r echo=FALSE}
+```{r}
 # load local textfiles listing key positive and negative words
 #taken from https://github.com/mjhea0/twitter-sentiment-analysis
 positive_words = scan('./data/positive-words.txt', what = 'character', comment.char=';') #read the positive words
@@ -144,7 +130,7 @@ setup_twitter_oauth(consumer_key=consumer_key,
 ```
 
 Collect tweets about celebrities, calculate sentiment scores...
-```{r, echo=FALSE}
+```{r}
 tweetsFilename = 'data/tweets.csv'
 n_tweets = 1e3
 celebHandles = Dict$new(c("Kanye West" = "@KanyeWest",
@@ -222,7 +208,7 @@ na.action = na.exclude)
 anova(tweets_lm0, tweets_lm1)
 ```
 
-Using the ANOVA function in R, we find a p-value which is less than 0.05. With that, we reject the hypothesis that the sentiment score of a tweet does not depend on which celebrity the tweet pertains to.
+Using the ANOVA function in R, we find a p-value which is less than 0.05. With that, we find that the distributions of seniments of tweets about various artists come from different distributions.
 
 ### Assessing Model Quality Using Tweet Knowledge as a Predictor
 ```{r}
@@ -243,7 +229,7 @@ Through statistical significance tests and inspection of visualizations, we beli
 
 ## Question 2 - Website visits (between groups - Two factors)
 Set up libraries, load data...
-```{r, echo=FALSE}
+```{r}
 if (F) {
   install.packages("gmodels", dependencies=T)
 }
@@ -324,7 +310,7 @@ Statistically test if variable page visits deviates from normal distribution
 ```{r}
 shapiro.test(visits$pages)
 ```
-A simple Shapiro-Wilk normality test reveals, with a p-value of 2.2e-16, it is unlikely that the true distribution of page visit counts across all scenarios can be described by a linear model.
+A simple Shapiro-Wilk normality test reveals, with a p-value of 2.2e-16, it is unlikely that the true distribution of page visit counts across all scenarios are sampled from normal distributions.
 
 ### Model analysis
 We construct linear models for the number of page visits as described by some factors:
@@ -388,7 +374,7 @@ We analyzed the number of page visits for a given website. In particular, we ins
 ##Question 3 - Linear regression analysis
 
 Set up libraries, load data...
-```{r, echo=FALSE}
+```{r}
 if (F) {
   install.packages("ggpubr", dependencies=T)
   install.packages("ggExtra", dependencies=T)
@@ -426,7 +412,7 @@ The average price of the ticket to get from City1 to City2
 
 ### Visual inspection
 Graphical analysis of the distribution of the dependent variable, e.g. histogram, density plot
-```{r, echo=FALSE}
+```{r}
 hist(airfare$averageFare, main="Airfare Average Prices by Route", xlab="Average Price")
 ```
 The price of airfares appears normally distributed, centered somewhere around 175 units. The prices are right skewed, although this is expected because the price has a lower bound of 0.
@@ -502,7 +488,7 @@ We performed a multiple regression on the average airfare of a route from one ci
 
 ## Question 4 - Logistic regression analysis
 Set up libraries, collect data...
-```{r, echo=FALSE}
+```{r}
 if (F) {
   install.packages("caret")  
 }
@@ -533,10 +519,10 @@ Note: the experiment collected and recorded this variable as a "gender". We shal
 ![Conceptual Model for Sex Prediction](figures/logisticConceptualModel.jpg)
 <br/>
 
-The Null Hypothesis would suggest that the independent variables, each individually and combinations of them, do not have statistically significant trends such that we can reliably predict the sex of a new subject given their feature size measurements. The Alternative Hypothesis, then, would be to say that we can reliably attempt to predict the sex of a subject given their feature size measurements because we find different sexes to exhibit different trends in these measurements. 
+The Null Hypothesis would suggest that the independent variables, which are the lengths of hands and feet, do not have statistically significant relationships with the sex of the subject. The Alternative Hypothesis, then, would be that there is a statistically significant relationship between the lengths of hands and feet and the sex of the subject.
 
 ### Visualization of Data
-```{r, echo=FALSE}
+```{r}
 pairs(~handLen+footLen,data=shf,
    main="Simple Scatterplot Matrix")
 
@@ -548,7 +534,7 @@ plot(p1Q4)
 ```
 
 ### Logistic Regression
-```{r, echo=FALSE}
+```{r}
 shf$sex[shf$gender==1] <- 0
 shf$sex[shf$gender==2] <- 1
 
@@ -562,8 +548,8 @@ anova(model0, model1, model2, test="Chisq")
 ```
 We use of ANOVA for the comparison of our models:
 
-* From random classification of subjects, we find that adding in Hand Lenth as a predictor improves our linear model. Statistically, the chance that Hand Length as an indicator improves our model without it being a truly good indicator is 2.2e-16: we reject that Hand Length is independent of the sex of a subject.  
-* Similarly, we find that additionally adding Foot Length as a predictor improves our model. Statistically, the chance that Foot Length as an indicator improves our previous model, with just Hand Length as an indicator, without it being a truly good indicator is 3.954e-8: We reject that Foot Length is independent of the sex of the subject.  
+* From random classification of subjects, we find that adding in Hand Length as a predictor improves our linear model. Statistically, the chance that Hand Length as an indicator improves our model without it being a truly good indicator is 2.2e-16: we find that hand length has a relationship with the sex of a subject.
+* Similarly, we find that additionally adding Foot Length as a predictor improves our model. Statistically, the chance that Foot Length as an indicator improves our previous model, with just Hand Length as an indicator, without it being a truly good indicator is 3.954e-8:we find that foot length has a relationship with the sex of a subject.
 
 ### Visualization of Results
 ```{r}
