@@ -1,5 +1,5 @@
-twitter_keys.R
-.httr-oauth
-.RData
-.Rhistory
-
+*twitter_keys.R
+*.httr-oauth
+*.RData
+*.Rhistory
+*.zip

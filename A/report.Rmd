@@ -6,9 +6,11 @@ output:
   pdf_document:
     fig_caption: yes
     number_sections: yes
+  html_document:
+    df_print: paged
   word_document: default
 subtitle: CS4125 Seminar Research Methodology for Data Science
-bibliography: "references.bib"
+bibliography: references.bib
 ---
 
 ```{r setup, include=FALSE}
@@ -113,7 +115,7 @@ Our tweet analysis seeks to answer the following question: Is there a difference
 <br/>
 
 ### Collecting Preliminary Data
-Collect positive and negative words and related functions, set up twitter oauth...
+Collect positive and negative words and related functions, set up Twitter oauth...
 ```{r}
 # load local textfiles listing key positive and negative words
 #taken from https://github.com/mjhea0/twitter-sentiment-analysis
@@ -160,7 +162,7 @@ tweets$score = score.sentiment(tweets$text, positive_words, negative_words)[[1]]
 
 ### Tweet Sentiment Analysis
 Is there a difference in the sentiment of the tweets related to the different celebrities? We inspect this question using context independent sentiment analysis of tweets about them. The data was collected as follows:
- 1. We used the twitter api to collect the 1000 most recent tweets which contain the twitter tag of the celebrity of interest
+ 1. We used the Twitter api to collect the 1000 most recent tweets which contain the twitter tag of the celebrity of interest
  2. Punctuation and links were removed from the tweets
  3. Upon these "parsed" tweets, we counted the number of "positive" and "negative" words present in the tweet, as provided in lists for the assignment, and the tweets were given a sentiment score as a difference of the positive and negative word counts
 
@@ -184,6 +186,7 @@ We use the Levene Test to assess homogeneity of variance. At an alpha value of .
 
 ### Graphical Examination of Means and Variations of Tweet Sentiment by Celebrity
 ```{r}
+par(cex.axis=.75)
 boxplot(score ~ name, data=tweets)
 par(mfrow=c(2,3))
 for (name in unique(tweets$name)) {
@@ -220,8 +223,34 @@ The Bonferroni Correction analysis shows that the tweet distributions for most p
   - Nicki Minaj and Cardi B
   - Nicki Minaj and Kanye West
 
-### Findings
-Through statistical significance tests and inspection of visualizations, we believe that the sentiment score distribution from tweets pertaining to various American celebrity artists do not come from the same distribution. The sampled distributions of sentiment scores about artists have different variances and median sentiment scores. However, some pairs of celebrities appear to come from similar distributions.
+### Small Section for Scientific Publication
+
+---
+
+  The modern music industry lends itself to creating artists into celebrities, celebrating them as personalities that receive a lot of attention outside of their music. Recent performances, works, and presentation in other media create seemingly distinct attitudes towards these artists. Public discourse about these artists can be found on online platforms, and so we ask: Is there a difference in the sentiment of the tweets related to the different celebrities?
+  
+  For our analysis, we collect the 1000 most recent tweets which tag a small set of artists, listed as the following:
+  
+  - Drake
+  - Kanye West
+  - Cardi B
+  - Nicki Minaj
+  - Ariana Grande
+  - Lil Pump
+  
+  This selection of artists make music at intersecting areas of hip hop and pop music, but they have very different styles of music, online presences, and types of fans. One should also note that all tweets were also pulled from the Twitter API at the same time, and the artists will have had varying levels of activity and perhaps different types of attention surrounding them at the time of the tweet collection.
+  
+  To guage the sentiments of the tweets, we produce a "sentiment score"" for each tweet using the following method: We use a collection of positively and negatively connotated words. A tweet initially has a sentiment score of zero, and the score is incremented and decremented for the presence of each postiively and negatively connotated word, respectively. This lets us produce a dataset of the sentiment scores of 1000 tweets from each of these six artists.
+  
+  This process gives us a sampling of the distribution of the sentiment of tweets related to given artists. To answer the posed question relating to homogeneity of tweet sentiments, we compare the distributions and check for statistically significant differences between these distributions.
+  
+  First, we use the Levene Test to assess homogeneity of variance across tweet sentiment distributions. The test reports a p-value of 0.0097, so there is significant difference in the variances of these sentiment distributions. In another test, we create linear models to fit the sentiment score of a tweet to the person which it pertains to, as well as a linear model which does not use any predictors. An analysis of variance for the two linear models produces a p-value close to zero (at a computed 2.2e-16), showing that the tweet sentiment distributions are significantly different per relevant celebrity.
+  
+![Tweet Score Distributions](figures/tweetScoreDistributions.png)
+  
+  Finally, our boxplot above helps to visually show the unique types of tweet sentiment distributions across celebrities. According to the whiskers and outlier points of the boxplots, no two tweet distributions are exactly the same. Most tweet sentiments, across celebrities, are often neutral or positive, but Kanye West's tweet sentiments are neutral especially often, and Lil Pump's tweets are negative far more often than for other artists. In general, the sentiments towards artists, as expressed in tweets, can vary a lot depending on who they pertain to.
+
+---
 
 
 
@@ -313,41 +342,16 @@ shapiro.test(visits$pages)
 A simple Shapiro-Wilk normality test reveals, with a p-value of 2.2e-16, it is unlikely that the true distribution of page visit counts across all scenarios are sampled from normal distributions.
 
 ### Model analysis
-We construct linear models for the number of page visits as described by some factors:
-
-* model0 - page visit count without predicting variables  
-* model1 - page visit count as linearly described by website version  
-* model2 - page visit count as linearly described by user type  
-* model3 - page visit count as linearly described by website version and user type, independently 
-* model3 - page visit count as linearly described by website version and user type, with interaction effects 
-
 ```{r}
-pages_model0 = lm(pages~1, data=visits,
-                  na.action=na.exclude)
-pages_model1 = lm(pages~version, data=visits,
-                  na.action=na.exclude)
-pages_model2 = lm(pages~portal, data=visits,
-                  na.action=na.exclude)
-pages_model3 = lm(pages~version+portal, data=visits,
-                  na.action=na.exclude)
-pages_model4 = lm(pages~version+portal+version:portal,
-                  data=visits, na.action=na.exclude)
+pages_model = glm(pages~version+portal+version:portal,
+                   data=visits, na.action=na.exclude)
+summary(pages_model)
 ```
+Because our data does not follow a normal distribution, we use a generalized linear model to assess the abiilty of the website version and visitor type, as well as an interaction effect between said conditions, to predict page visit counts. According to our models, we recognize the following statistically significant trends:
 
-```{r}
-anova(pages_model0, pages_model1)
-```
-Model 1 attempts to predict the page visit count using page version, and an ANOVA test finds, with p-value = 2.2e-16, that page visit count is not independent of the page version.
-
-```{r}
-anova(pages_model0, pages_model2)
-```
-Model 2 attempts to predict the page visit count using user type, and an ANOVA test finds, with p-value = 1.734-15, that page visit count is not independent of the user type.
-
-```{r}
-anova(pages_model3, pages_model4)
-```
-Because model1 and model2, which use page version and user type as predictors, can be used to explain trends in page visits, we would expect that a model using both of these predictors would work as well. This is how we constructed model3. Now we use an ANOVA test to see whether including interaction effects would further help predict the number of page visits, as we construct in model4. Through this ANOVA test with a p-value of 1.264e-12, we see that interaction effects can be further used to explain the number of page visits seen.
+- with p = 8.85e-5, we expect the old version of the website to recieve .53 fewer visits on average
+- with p = 2e-16, we expect a consumer to visit the webpage 1.54 times more on average
+- with p = 1.26e-12, we expect consumers using the old version of the portal to visit the page 1.4 times less on average
 
 ###Simple effect analysis
 ```{r}
@@ -365,8 +369,31 @@ Our analysis shows that, indeed, there is an interaction effect, but only in som
 * For version 1, the type of user indeed changes the page visit count. The test specifically finds a p-value of 2e-16, so we have reason to believe that there is a statistically significant difference in page visit counts for the consumer vs business users when using this version. 
 
 ### Report section for a scientific publication
-We analyzed the number of page visits for a given website. In particular, we inspected the effects of the type of user and the version of the website presented to the type of user. In general, we find that the number of page visits is indeed dependent on the type of user visiting the page and the version of the page. We also found that some conditions of the experiment seem to have interaction effects. In particular, we find that for users that are using portal version 0, there is a statistically significant difference in the trends of page visit counts for the business users and the consumer users.
 
+---
+
+  We are tasked with analyzing the results of an A-B study of a webserver as administered in two different versions to two different groups. In particular, we inspect an old version and a new version of the website, collecting how many visits the website receives for each of the versions. We collect these observations for two distinct audiences: consumers and company employees. We investigate the distributions, with some plots shown below.
+  
+  ![Distribution of Page Visits](figures/webpageDistribution.png)
+ 
+  ![Distributions of page visits for all combinations of consumers and website versions.](figures/webpageDistributionByGroup.png)
+  
+  Visually, the distributions of page visits don't appear to be normal in most distributions. Especially across page visits of all conditions, the distribution of page visits does not look normal. With a Shapiro Test, reporting a p-value extremely close to zero (at p=2.2e-16), we confirm that the distribution of all page visits across all visitors and versions is far from a normal distribution.
+ 
+  Because our data does not follow a normal distribution, we use a generalized linear model to assess the abiilty of the website version and visitor type, as well as an interaction effect between said conditions, to predict page visit counts. According to our models, we recognize the following statistically significant trends:
+
+- with p = 8.85e-5, we expect the old version of the website to recieve .53 fewer visits on average
+- with p = 2e-16, we expect a consumer to visit the webpage 1.54 times more on average
+- with p = 1.26e-12, we expect consumers using the old version of the portal to visit the page 1.4 times less on average
+
+We then perform an analysis of the extent of the interaction effect with an analysis of variance. Our analysis shows that, indeed, there is an interaction effect, but only in some cases:
+
+* For version 0, the type of user doesn't change the page visit count. The test specifically finds a p-value of 0.317, so we don't have reason to believe that there is a statistically significant difference in page visit counts for the consumer vs business users when using this version. 
+* For version 1, the type of user indeed changes the page visit count. The test specifically finds a p-value of 2e-16, so we have reason to believe that there is a statistically significant difference in page visit counts for the consumer vs business users when using this version. 
+  
+  In general, we find that the newer version of our website aggregates at leasat as many page visits, if not more, from a user, across all user types. All else equal, the provider of this website should use the newer version of their page in all cases.
+
+---
 
 
 
@@ -394,7 +421,7 @@ airfare <- read.csv(file="data/airfare.csv", header=T)
 \pagebreak
 
 ### Conceptual model
-For a self-guided linear regression analysis, we investigate a dataset which records airfares from cities to cities. We would like to see if the chosen independent variables can be used to predict the price of a ticket from one city to nother. For the analysis:
+For a self-guided linear regression analysis, we investigate a dataset which records airfares from cities to cities. We would like to see if the chosen independent variables can be used to predict the price of a ticket from one city to another. For the analysis:
 
 **Dependent Variable: Average Fare**
 
@@ -413,7 +440,7 @@ The average price of the ticket to get from City1 to City2
 ### Visual inspection
 Graphical analysis of the distribution of the dependent variable, e.g. histogram, density plot
 ```{r}
-hist(airfare$averageFare, main="Airfare Average Prices by Route", xlab="Average Price")
+hist(airfare$averageFare, main="Airfare Average Prices by Route", xlab="Average Price ($)")
 ```
 The price of airfares appears normally distributed, centered somewhere around 175 units. The prices are right skewed, although this is expected because the price has a lower bound of 0.
 
@@ -421,7 +448,7 @@ The price of airfares appears normally distributed, centered somewhere around 17
 ```{r}
 # Basic Scatterplot Matrix
 pairs(~averageFare+distance+leadShare+weeklyPassengers,data=airfare,
-   main="Simple Scatterplot Matrix")
+   main="Airfare Scatterplot Matrix", pch=10, cex=.2)
 ```
 We produce a scatterplot matrix for our independent and dependent variables. Some of the scatterplots which stand out:
 
@@ -475,24 +502,56 @@ The output of the partial correlation coefficients analysis shows that, for all 
 ### Impact analysis of individual cases
 Examine effect of single cases on the predicted values (e.g. DFBeta, Cook's distance)
 ```{r}
-plot(cooks.distance(fare_model3))
+plot(cooks.distance(fare_model3), main="Airfare Cook's Distances", ylab = "Cook's Distance", xlab="")
 ```
 The plotting of cook's distance shows that all DFBeta are far less than one. Of the 1000 airfare data points, only a handful of points have values which seem to deviate from the rest, but we do not believe that these values would not reveal any sort of influence of single cases on predicted values.
 
 ### Report section for a scientific publication
-We performed a multiple regression on the average airfare of a route from one city to another. We found that the average airfare is dependent on the distance between cities, the amount of flights on the route owned by a dominant airline, and the average number of weekly passengers of the given route. We also found that each of these independent variables exhibit high degrees of correlation.
 
+---
 
+  we investigate a dataset which records airfares from cities to cities. We would like to see if the chosen independent variables can be used to predict the price of a ticket from one city to another. In particular, we observe the flight fares of flights and inspect their relationships with the distance traveled in the flight, the number of passengers that take the route each week, and the percentage of flights which are provided by the airline which serves the given route the most.
+  
+  ![Airfare Histogram.](figures/airfareHistogram.png)
+  
+  We plot the relative frequencies of airfare prices in our dataset. The prices seem somewhat normal, although the distribution is, of course, right tailed because the prices approach a lower bound of $0.
+  
+  ![Scatterplots visualizing the relationships between the collected metrics related to airfare.](figures/airfareScatterplots.png)
+  
+  We produce a scatterplot matrix to help visualize the potential relationships between the potential predictors of airfare. At a glance, it appears that airfare increases as the intercity distance is increases, as one would expect, although the airfares vary a lot. When observing the relationship between the airfare with respect to the percentage of route share, it appears that the airfare has a weak relationship with the lead share percentage, but perhaps there is a slight negative correlation between these measures. Finally, routes with a higher throughput of passengers per week appear to weakly decrease in price of airfare as the throughput increases.
+  
+  To numerically assess the relationships between these potential predictors of airfare, we produce linear models and report the conclusions below:
+  
+| Fare Predictors                         | 2.5% Confidence Slope  | Fare Slope           | 97.5% Confidence Slope  | p-value  |
+|:----------------------------------------|:-----------------------|:---------------------|:------------------------|:---------|
+| distance                                | 0.04621403             | 0.05054214           | 0.05487025              | 2.2e0-16  |
+| distance, lead share                    | -0.0896                | -0.00533             | -0.0017                 | .004049  |
+| distance, lead share, weekly passengers | .1116                  | 0.2815              | 0.045                    | .001181  |
 
+As showed above, the various measurements related to routes have statistically significant linear relationships with airfares. As we saw in our visualizations, the cost of the flight increases with distance, and the cost decreases with the percentage of flights provided by the leading airline. However, An intuition we attempted to derive from the plots is inconsistent with the results of our models: the airfare of a route actually increases with the number of passengers that take the route each week. The error in visualization is reasonable because of how dense the plot is.
+  
+  A partial correlation coefficient analysis shows that, for all combinations, the testing of independence of all pairs of independent variables produce p-values close to zero. That is, all pairs of independent variables are found to have some amount of correlation. In particular, the distance of the flight and the lead share percentage are quite strongly negatively correlated, with an r value of -0.54. The number of weekly passengers is negatively correlated with both the lead share perentage and the distance of the flight, although quite weakly, at r values of -0.137 and -0.149, respectively.
+  
+  ![Cook's Distances as measures from our model built upon all regressors. Only handful of points appear to deviate from the rest.](figures/airfareCooksDistances.png)
+  
+  Finally, we inspect how extraneous points might influence the reliability of our linear regression models. Our dataset contains exactly 1000 points, and a visual inspection shows that only about five points have Cook's distances which are especially larger than the rest. The highest Cook's distance we observe is also just around 0.1. With that, we don't believe that the small number of deviators heavily influence what airfares our model might predict.
+  
+  As we have explored, we can predict the cost of airfare for a given flight route by using some characteristics of the route: airfares tend to decrease with the number of passengers which use the route each week; airfares also decrease as the percentage of flights provided by some leading airline increase; finally, and maybe obviously, the airfare of a route tends to increase as the distance that the route covers increases.
+
+---
+ 
 
 
 ## Question 4 - Logistic regression analysis
 Set up libraries, collect data...
 ```{r}
 if (F) {
-  install.packages("caret")  
+  install.packages("caret")
+  install.packages('questionr')
+  install.packages('pscl')
 }
 
+library(questionr)
 library(caret)
 library(gmodels)
 library(ggpubr)
@@ -555,8 +614,11 @@ We use of ANOVA for the comparison of our models:
 ### Visualization of Results
 ```{r}
 sexProbs = predict.glm(model2, shf, type="response")
-sexPreds = sapply(sexProbs, function(x) if (x<.5) 'male' else 'female')
+sexPreds = sapply(sexProbs, function(x) if (x>.5) 'male' else 'female')
 sexPreds = factor(sexPreds)
+
+odds.ratio(model2)
+pscl::pR2(model2)
 
 dnn = c('predicted', 'observed')
 sexTable = table(sexPreds, shf$sex, dnn=dnn)
@@ -565,7 +627,30 @@ sexConfusionMatrix
 ```
 
 ### Report section for a scientific publication
-We find that, when predicting the sex of an individual, Hand Length and Foot Length can each be used to attempt to predict the sex of the individual. Using these measurements as indicators are both statistically significantly better than attempting to predict the sex of a person by random chance. Our model considering both of these factors achieves a training error of ~89.7%.
+
+  Using logistic regression, we use some body size measurements of subjects and look for their relationships with the sex of the given subject. In particular, we use the lengths of a subject's hand and food as a predictor, and of course, we assume that the lengths of the hands and feet of our subjects as well as their sexes are independent of those observations in other subjects.
+  
+  We build a logistic regression model. With an ANOVA test, we find that:
+  
+  * addition of hand length to the predictor free model creates a stronger model, with ANOVA reporting a p-value of 2.2e-16
+  * addition of the foot length to the previous model, using hand length, creates an even stronger model, ANOVA reporting a p-value of 3.954e-8
+  
+  To further evaluate our model, we calculate the following:
+  
+  * the pseudo-r-squared associated with our model is .7899
+  * the odds-ratio related to hand length is 1.116, with a 95% confidence interval of [1.03, 1.21]
+  * the odds-ratio related to foot length is 1.117, with a 95% confidence interval of [1.01, 1.27]
+
+  With that, we find both predictors to build a strong logistic regression model for predicting the sex of a subject. We can quickly visualize the performance of our logistic regression model with a confusion matrix, shown model. The model has an accuracy of .8968, which is quite good when only using lengths of body parts.
+  
+|           |        | Observed   |          |
+|-----------|:-------|:-----------|:---------|
+|           |        | Female     | Male     |
+| Predicted | Female | 66         | 7        |
+|           | Male   | 9          | 73       |
+
+  
+  In conclusion, We find that, when predicting the sex of an individual, hand length and foot length can each be used to attempt to predict the sex of the individual. Using these measurements as indicators are both statistically significantly better than attempting to predict the sex of a person by random chance. Our model considering both of these factors achieves a training error of ~89.7%.
 
 
 
@@ -611,4 +696,19 @@ randomInterceptSession <- lme(score ~ session,
 summary(randomInterceptSession)
 anova(randomInterceptOnly,randomInterceptSession)
 ```
-We perform an analysis to observe the linear regressions of scores on the number of sessions from a subject across all subjects. We create linear models with and without use of session as an explanatory variable. We then compare these linear models, and with a p-value of <.001, we find that it cannot be the case that scores of a subject are independent of the number of sessions they attend. That is, constructing a linear model for the score of a subject is changed when we consider the number of sessions they attend.
+
+With a p-value of <.001, we find that there is a correlation between the number of sessions attended by a subject and the change in their test score. In particular, we see that a subject's score increases by ~0.368 points per training session that they attend.
+
+### Report section for a scientific publication
+
+---
+
+  We inspect a dataset recording a longitudinal analysis which, for a group of subjects, records the scores they achieve after each training session for some undescribed task. We're interested in seeing if the scores on the exercise systematically vary with respect to the number of training sessions completed.
+  
+  First, we would like to analyze, as individuals are trained at the task more over time, whether they consistently change their post-training scores. We assess this with a Linear Mixed-Effect Model, and with a p-value of <.001, we find that there is a correlation between the number of sessions attended by a subject and the change in their test score. In particular, we see that a subject's score increases by ~0.368 points per training session that they attend.
+    
+  We also inspect if the scores of individuals vary significantly after a given number of training sessions. Again, we use a Linear Mixed-Effect Model and find a high variance between the scores of each subject on a given session. WIith a p-value of 0, we find that the subjects have significant variance in their scores.
+    
+  With this analysis, we believe that the task being trained, whatever the task happens to be, does indeed improve the subjects at the task being tested upon. However, the test is scored at a maximum of 300, and subjects only improved their scores by about .37 points per session, which sounds like a very small improvement.
+  
+---
